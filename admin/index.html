@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../style.css" rel="stylesheet">
+</head>
+
+<body>
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <h1 class="text-center mb-4">Dashboard</h1>
+
+            <div class="row mb-4">
+                <div class="col-md-6 offset-md-3">
+                    <form action="#" method="GET">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search for a student" name="search">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-danger text-white">
+                            <h3 class="card-title">Not Timed In</h3>
+                        </div>
+                        <div class="card-body" style="padding-bottom: auto;">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    John Doe
+                                    <a href="#" class="btn btn-sm btn-primary float-end">Generate QR</a>
+                                </li>
+                                <li class="list-group-item">
+                                    Jane Smith
+                                    <a href="#" class="btn btn-sm btn-primary float-end">Generate QR</a>
+                                </li>
+                                <!-- Add more static entries as needed -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-warning">
+                            <h3 class="card-title">Timed In</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    Alice Johnson
+                                    <a href="#" class="btn btn-sm btn-primary float-end">Generate QR</a>
+                                </li>
+                                <li class="list-group-item">
+                                    Bob Williams
+                                    <a href="#" class="btn btn-sm btn-primary float-end">Generate QR</a>
+                                </li>
+                                <!-- Add more static entries as needed -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h3 class="card-title">Timed Out</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    Charlie Brown
+                                </li>
+                                <li class="list-group-item">
+                                    Diana Prince
+                                </li>
+                                <!-- Add more static entries as needed -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
