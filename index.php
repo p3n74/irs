@@ -1,14 +1,8 @@
 <?php
-session_start();
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "irs";
-$conn = new mysqli($servername, $username, $password, $dbname);
+require "db.php";
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+
 }
 
 $error = "";
@@ -69,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             </div>
                             <div>
-                                <p class="mb-0">Log in as an administrator? <a href="login.html"
+                                <p class="mb-0">Log in as an administrator? <a href="login.php"
                                         class="text-white-50 fw-bold">Click Here</a>
                                 </p>
                             </div>

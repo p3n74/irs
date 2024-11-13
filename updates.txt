@@ -1,0 +1,18 @@
+
+hello guys, so there are updates to the website
+
+first of all here is the updated structure of the events table
+and the database.
+
+first we will not have a table for all the participants as that poses several problems
+	problem 1: Events can be big, such having a table with ALL the participants from past, present
+	and future events may not be efficient as it could reach 10,000+ 
+
+	Solution: Suppose there is a CSV file, of the participants, need to find a way so that when an event has started
+	only the data of the participants CSV file is loaded into the events and find a way to make it secure and work with mysql
+
+Design a CSV file format and the code to read and store data and to load.
+	in this CSV file there would be the participants ID and Name, email and verification token and as we need the event ID aswell
+
+check dbadmin.dcism.org for the database, u guys know the password
+
