@@ -1,6 +1,6 @@
 <?php
 
-echo "Sup webnickas";
+echo "Sup webnic2kas";
 
 
 ?>
