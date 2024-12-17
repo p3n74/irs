@@ -7,6 +7,8 @@ $userDetails = null; // To store the queried user details
 $selectedUserId = null;
 $localToken = ""; // To store the final token
 
+$eventid = $_SESSION['eventid']; 
+
 // Handle the search query
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
     // Sanitize user input
@@ -125,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                             <!-- Display User Details -->
                             <?php if ($userDetails): ?>
                                 <div class="mt-4">
-                                    <h4>User Found:</h4>
+                                    <h4>Is This You?:</h4>
                                     <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
                                     <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
                                     
