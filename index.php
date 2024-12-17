@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <p class="text-white-50 mb-4">Enter your event key to continue.</p>
                                 <form action="" method="POST">
                                     <div class="form-outline form-white mb-4">
-                                        <input type="text" id="eventKey" name="eventKey" autocomplete="off"
+                                        <input type="password" id="eventKey" name="eventKey" autocomplete="off"
                                             class="form-control form-control-lg" required />
                                         <label class="form-label" for="eventKey">Event Key</label>
                                     </div>
