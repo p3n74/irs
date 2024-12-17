@@ -1,28 +1,6 @@
 <?php
 require "../db.php"; // Database connection file
 
-// Initialize variables
-$searchError = "";
-$userDetails = null; // To store the queried user details
-$selectedUserId = null;
-$localToken = ""; // To store the final token
-$userEventStatus = null; // Save attendance status
-
-$eventid = $_SESSION['eventid']; 
-
-// Handle the search query
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
-    // Sanitize user input
-    $searchInput = trim($_POST['searchName']);
-    $names = explode(" ", $searchInput);
-
-    // Ensure at least first and last name are provided
-    if (count($names) < 2) {
-        $searchError = "Please enter both first and last name.";
-    } else {
-<?php
-require "../db.php"; // Database connection file
-
 // Start output buffering to prevent unwanted output
 ob_start();
 session_start();
