@@ -94,7 +94,7 @@ if ($userDetails && $userEventStatus !== null) {
         function showQRCode(event, userId, token) {
             event.preventDefault(); // Prevent page refresh on form submission
 
-            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?token=" + token + "&format=svg";
+            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?token=" + token + "&event=" + event + "&format=svg";
             $('#qrCodeModal img').attr('src', qrCodeUrl);
             $('#qrCodeModal').modal('show');
         }
