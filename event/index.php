@@ -94,7 +94,7 @@ if ($userDetails && $userEventStatus !== null) {
         function showQRCode(event, userId, token) {
             event.preventDefault(); // Prevent page refresh on form submission
             string info = "token=" + token + "&event=" + event;
-                        var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountR?egistration/ingress.php"+info+"&format=svg";
+            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountR?egistration/ingress.php"+info+"&format=svg";
 
             $('#qrCodeModal img').attr('src', qrCodeUrl);
             $('#qrCodeModal').modal('show');
@@ -136,9 +136,9 @@ if ($userDetails && $userEventStatus !== null) {
 
                                         <!-- Button logic based on user event status -->
                                         <?php if ($userEventStatus === 0): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Join Event</button>
+                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(<?php echo $eventId; ?>, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Join Event</button>
                                         <?php elseif ($userEventStatus === 1): ?>
-                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
+                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(<?php echo $eventId; ?>, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
                                         <?php elseif ($userEventStatus === 2): ?>
                                             <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
                                         <?php endif; ?>
