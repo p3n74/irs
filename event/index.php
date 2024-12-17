@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
             } else {
                 // Use existing token
                 $token = $currToken;
-                echo "Token reused: " . htmlspecialchars($token);
+                echo $token;
             }
         }
     } else {
