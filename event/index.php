@@ -8,7 +8,7 @@ $selectedUserId = null;
 $localToken = ""; // To store the final token
 
 $eventid = $_SESSION['eventid']; 
-
+echo $eventid;
 // Handle the search query
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
     // Sanitize user input
