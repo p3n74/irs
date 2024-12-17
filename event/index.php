@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
             $selectedUserId = $userDetails['uid'];  // Store selected user ID
 
             // Query the event_participants table to check if the user has joined the event
-            $eventQuery = $conn->prepare("SELECT join_time, leave_time FROM event_participants WHERE user_id = ? AND event_id = ?");
+            $eventQuery = $conn->prepare("SELECT join_time, leave_time FROM event_participants WHERE uid = ? AND event_id = ?");
             $eventQuery->bind_param("ii", $selectedUserId, $eventid);
             $eventQuery->execute();
             $eventResult = $eventQuery->get_result();
