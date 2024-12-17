@@ -134,9 +134,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                             <h2 class="fw-bold mb-4 text-uppercase">Search User</h2>
                             
                             <!-- Search Form -->
-                            <form method="POST" action="">
+                            <form id="searchForm" method="POST" action="">
                                 <div class="form-outline form-white mb-4">
-                                    <input type="text" name="searchName" class="form-control form-control-lg" placeholder="Enter First and Last Name" autocomplete="off" required />
+                                    <input type="text" name="searchName" id="searchName" class="form-control form-control-lg" placeholder="Enter First and Last Name" autocomplete="off" required />
                                 </div>
                                 <button class="btn btn-outline-light btn-lg px-5" type="submit">Search</button>
                             </form>
@@ -156,17 +156,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                                     <!-- Confirmation Form -->
                                     <form method="POST" action="">
                                         <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
-
-                                        <!-- Button logic based on user event status -->
-                                        <?php if ($userEventStatus === 0): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser">Join Event</button>
-                                        <?php elseif ($userEventStatus === 1): ?>
-                                            <button class="btn btn-danger" type="submit" name="confirmUser">Leave Event</button>
-                                        <?php elseif ($userEventStatus === 2): ?>
-                                            <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
-                                        <?php endif; ?>
+                                        <button class="btn btn-primary" type="submit" name="confirmUser">Confirm</button>
                                     </form>
-
+                                    
                                     <!-- QR Code Modal Trigger -->
                                     <?php if (!empty($localToken)): ?>
                                         <button type="button" class="btn btn-info mt-3" data-bs-toggle="modal" data-bs-target="#qrCodeModal">
@@ -190,13 +182,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                                     <?php endif; ?>
                                 </div>
                             <?php endif; ?>
-
-                            <!-- Display Local Token if available -->
-                            <?php if (!empty($localToken)): ?>
-                                <div class="alert alert-info mt-4">
-                                    <strong>Token:</strong> <?php echo htmlspecialchars($localToken); ?>
-                                </div>
-                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -205,6 +190,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     </section>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Prevent form submission and refresh
+        document.getElementById("searchForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Get user input
+            var searchInput = document.getElementById("searchName").value;
+
+            // Process search functionality with AJAX (or reload page)
+            window.location.href = "searchPage.php?searchName=" + encodeURIComponent(searchInput); // Adjust according to your logic
+        });
+    </script>
 </body>
 </html>
 
