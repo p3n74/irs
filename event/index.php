@@ -174,9 +174,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
                                         <!-- Button logic based on user event status -->
                                         <?php if ($userEventStatus === 0): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $userDetails['currboundtoken']; ?>')">Join Event</button>
+                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Join Event</button>
                                         <?php elseif ($userEventStatus === 1): ?>
-                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $userDetails['cussboundtoken']; ?>')">Leave Event</button>
+                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
                                         <?php elseif ($userEventStatus === 2): ?>
                                             <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
                                         <?php endif; ?>
@@ -213,3 +213,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     </div>
 </body>
 </html>
+
