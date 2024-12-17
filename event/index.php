@@ -10,6 +10,11 @@ $userEventStatus = null; // To save attendance status
 
 $eventid = $_SESSION['eventid']; 
 
+echo "debug";
+echo $selectedUserId;
+echo $localTokem;
+echo $userEventStatus;
+
 // Handle the search query
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
     // Sanitize user input
