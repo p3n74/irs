@@ -1,32 +1,20 @@
 <?php
 session_start();
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "irs";
-$conn = new mysqli($servername, $username, $password, $dbname);
+require "../db.php";
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-if (isset($_SESSION['eventKey'])) {
-    $eventKey = htmlspecialchars($_SESSION['eventKey']);
-
-    $query = "SELECT url FROM events WHERE event_key = '$eventKey'";
-    $result = $conn->query($query);
-    $row = $result->fetch_assoc();
-
-    if ($result && $row) {
-        $url = $row['url'];
-    } else {
-        $url = null;
-    }
+// Check if eventid is set in the session
+if (isset($_SESSION['eventid'])) {
+    $eventid = $_SESSION['eventid'];
 } else {
-    header("Location: ..");
+    // Redirect back if eventid is not set
+    header("Location: ../");
     exit();
 }
+
+echo "Event ID: " . $eventid;
+
+$url = "https://your-website.com/event.php?eventid=" . urlencode($eventid);
 ?>
 
 <!DOCTYPE html>
