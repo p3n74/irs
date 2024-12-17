@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
         $localToken = $token; // Save token to variable for later use
 
         // Only update token, no need to modify event participation times
-        echo json_encode(['token' => $token]);
+        echo json_encode(['token' => $token, 'userId' => $selectedUserId]);
     }
     $stmt->close();
 }
@@ -129,6 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                 success: function(response) {
                     var data = JSON.parse(response);
                     var token = data.token.trim();
+                    var userId = data.userId;
 
                     // Generate QR code with the new token and user ID
                     var qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=' + userId + '&token=' + token;
@@ -138,6 +139,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
                     // Show the modal with the QR code
                     $('#qrCodeModal').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error: " + error);
                 }
             });
         });
