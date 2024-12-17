@@ -6,9 +6,10 @@ $searchError = "";
 $userDetails = null; // To store the queried user details
 $selectedUserId = null;
 $localToken = ""; // To store the final token
+$userEventStatus = null; // To save attendance status
 
 $eventid = $_SESSION['eventid']; 
-echo $eventid;
+
 // Handle the search query
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
     // Sanitize user input
@@ -37,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
     }
 }
 
-// Handle confirmation of user details and token logic
+// Handle confirmation of user details and attendance logic
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     $selectedUserId = $_POST['userId'];
     $token = "";
@@ -85,11 +86,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     } else {
         echo "User not found.";
     }
-
     $stmt->close();
 
     // Save token into a local variable for further processing
     $localToken = $token;
+
+    // Check attendance status in event_participants
+    $statusStmt = $conn->prepare("SELECT join_time, leave_time FROM event_participants WHERE uid = ? AND eventid = ?");
+    $statusStmt->bind_param("ii", $selectedUserId, $eventid);
+    $statusStmt->execute();
+    $statusResult = $statusStmt->get_result();
+
+    if ($statusResult && $row = $statusResult->fetch_assoc()) {
+        $joinTime = $row['join_time'];
+        $leaveTime = $row['leave_time'];
+
+        // Determine user event status
+        if (is_null($joinTime) && is_null($leaveTime)) {
+            $userEventStatus = 0; // Not attended
+        } elseif (!is_null($joinTime) && is_null($leaveTime)) {
+            $userEventStatus = 1; // Currently attending
+        } elseif (!is_null($joinTime) && !is_null($leaveTime)) {
+            $userEventStatus = 2; // Fully attended
+        }
+    } else {
+        // No record found for this user and event
+        $userEventStatus = 0; // Default to not attended
+    }
+    $statusStmt->close();
+
+    // Display status for debugging (optional)
+    echo "<br>User Event Status: " . $userEventStatus;
+    echo "<br>Local Token: " . htmlspecialchars($localToken);
 }
 ?>
 
@@ -120,31 +148,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                             </form>
 
                             <!-- Error Message -->
-                            <?php if ($searchError): ?>
-                                <div class="alert alert-danger mt-3"><?php echo $searchError; ?></div>
-                            <?php endif; ?>
+              <?php if ($searchError): ?>
+                    <div class="alert alert-danger mt-3"><?php echo $searchError; ?></div>
+              <?php endif; ?>
 
-                            <!-- Display User Details -->
-                            <?php if ($userDetails): ?>
-                                <div class="mt-4">
-                                    <h4>Is This You?:</h4>
-                                    <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
-                                    <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
-                                    
-                                    <!-- Confirmation Form -->
-                                    <form method="POST" action="">
-                                        <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
-                                        <button class="btn btn-success" type="submit" name="confirmUser">Confirm</button>
-                                    </form>
-                                </div>
-                            <?php endif; ?>
+              <!-- Display User Details -->
+              <?php if ($userDetails): ?>
+                  <div class="mt-4">
+                      <h4>Is This You?:</h4>
+                      <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
+                      <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
+                    
+                    <!-- Confirmation Form -->
+                      <form method="POST" action="">
+                          <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
 
-                            <!-- Display Local Token if available -->
-                            <?php if (!empty($localToken)): ?>
-                                <div class="alert alert-info mt-4">
-                                    <strong>Token:</strong> <?php echo htmlspecialchars($localToken); ?>
-                                </div>
-                            <?php endif; ?>
+                          <!-- Button logic based on user event status -->
+                          <?php if ($userEventStatus === 0): ?>
+                              <button class="btn btn-primary" type="submit" name="confirmUser">Join Event</button>
+                          <?php elseif ($userEventStatus === 1): ?>
+                            <button class="btn btn-danger" type="submit" name="confirmUser">Leave Event</button>
+                        <?php elseif ($userEventStatus === 2): ?>
+                            <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
+                        <?php endif; ?>
+                    </form>
+              </div>
+          <?php endif; ?>
+
+          <!-- Display Local Token if available -->
+          <?php if (!empty($localToken)): ?>
+              <div class="alert alert-info mt-4">
+                  <strong>Token:</strong> <?php echo htmlspecialchars($localToken); ?>
+              </div>
+        <?php endif; ?>
                         </div>
                     </div>
                 </div>
