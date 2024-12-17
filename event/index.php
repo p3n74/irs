@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
             $updateStmt->execute();
             $updateStmt->close();
 
-            echo "New token generated as creation time was empty.";
+            echo $token;
         } else {
             // Check if the creationtime is older than 10 minutes
             $tenMinutesAgo = strtotime($currentTime) - 600; // 600 seconds = 10 minutes
@@ -98,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                 $updateStmt->execute();
                 $updateStmt->close();
 
-                echo "Token updated as creation time exceeded 10 minutes.";
+                echo $token;
             } else {
                 // Use existing token
                 $token = $currToken;
@@ -136,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
         $("form#confirmUserForm").on("submit", function(event) {
             event.preventDefault();
 
-            // Get userId and the token
+            // Get userId from input
             var userId = $("input[name='userId']").val();
 
             // Send AJAX request to update token and get QR code
@@ -152,7 +152,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                     var token = response.trim();
 
                     // Generate QR code with the new token
-                    var qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=' + userId + '&token=' + token + '&format=svg';
+                    var qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=' + userId + '&token=' + token;
+
+                    // Set the QR code URL in the modal
                     $('#qrCodeModal img').attr('src', qrCodeUrl);
 
                     // Show the modal with the QR code
