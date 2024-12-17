@@ -90,17 +90,23 @@ if ($userDetails && $userEventStatus !== null) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Function to open the modal with the QR code
+        // Function to open the modal with the QR code using the QR Server API
         function showQRCode(event, userId, token) {
-            event.preventDefault(); // Prevent page refresh on form submission
-            // URL encode the token and event to prevent any special characters from breaking the URL
-            var encodedToken = encodeURIComponent(token);
-            var encodedEvent = encodeURIComponent(event);
+            event.preventDefault(); // Prevent form submission and page refresh
 
-            // Construct the info to append to the QR code URL
-            var info = "token=" + encodedToken + "&event=" + encodedEvent;
-            var qrCodeUrl = "https://chart.googleapis.com/chart?chs=400x400&cht=qr&chl=https://accounts.dcism.org/accountR/registration/ingress.php?" + info;
+            // Construct the URL with token and event parameters
+            const url = `https://accounts.dcism.org/accountR/registration/ingress.php?token=${token}&event=${event}`;
+
+            // Encode the URL to ensure proper handling of special characters
+            const encodedUrl = encodeURIComponent(url);
+
+            // Generate the QR code URL by passing the encoded URL
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodedUrl}`;
+
+            // Set the QR code URL to the image inside the modal
             $('#qrCodeModal img').attr('src', qrCodeUrl);
+
+            // Show the modal
             $('#qrCodeModal').modal('show');
         }
     </script>
