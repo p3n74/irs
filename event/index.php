@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
         $lname = $names[1];
 
         // Search for the user in the database
-        $stmt = $conn->prepare("SELECT uid, fname, lname, email FROM users WHERE fname = ? AND lname = ?");
+        $stmt = $conn->prepare("SELECT uid, fname, lname, email FROM user_credentials WHERE fname = ? AND lname = ?");
         $stmt->bind_param("ss", $fname, $lname);
         $stmt->execute();
         $result = $stmt->get_result();
