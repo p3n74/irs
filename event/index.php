@@ -174,12 +174,14 @@ if ($userDetails && $userEventStatus !== null) {
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Back Button below the grey container -->
+      
+       <!-- Back Button below the grey container -->
     <div class="container text-center mt-3">
         <a href="../index.php" class="btn btn-secondary">Back</a>
     </div>
+    </section>
+
+   
 
     <!-- Modal for QR Code -->
     <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
