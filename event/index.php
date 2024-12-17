@@ -1,11 +1,11 @@
 <?php
-session_start();
 require "../db.php"; // Database connection file
 
 // Initialize variables
 $searchError = "";
 $userDetails = null; // To store the queried user details
 $selectedUserId = null;
+$localToken = ""; // To store the final token
 
 // Handle the search query
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
@@ -35,11 +35,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
     }
 }
 
-// Handle confirmation of user details
+// Handle confirmation of user details and token logic
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
-    $selectedUserId = $_POST['userId']; // Capture user ID for further use
-    echo "User ID confirmed: " . htmlspecialchars($selectedUserId);
-    // You can proceed to the next step, such as generating a QR code.
+    $selectedUserId = $_POST['userId'];
+    $token = "";
+    $currentTime = date("Y-m-d H:i:s");
+
+    // Query to get the user's creationtime and currboundtoken
+    $stmt = $conn->prepare("SELECT creationtime, currboundtoken FROM user_credentials WHERE uid = ?");
+    $stmt->bind_param("i", $selectedUserId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $row = $result->fetch_assoc()) {
+        $creationTime = $row['creationtime'];
+        $currToken = $row['currboundtoken'];
+
+        if (is_null($creationTime)) {
+            // If creationtime is NULL, insert current time and generate new token
+            $token = bin2hex(random_bytes(32));
+            $updateStmt = $conn->prepare("UPDATE user_credentials SET creationtime = ?, currboundtoken = ? WHERE uid = ?");
+            $updateStmt->bind_param("ssi", $currentTime, $token, $selectedUserId);
+            $updateStmt->execute();
+            $updateStmt->close();
+
+            echo "New token generated as creation time was empty.";
+        } else {
+            // Check if the creationtime is older than 10 minutes
+            $tenMinutesAgo = strtotime($currentTime) - 600; // 600 seconds = 10 minutes
+            $creationTimestamp = strtotime($creationTime);
+
+            if ($creationTimestamp < $tenMinutesAgo) {
+                // Update creationtime and currboundtoken
+                $token = bin2hex(random_bytes(32));
+                $updateStmt = $conn->prepare("UPDATE user_credentials SET creationtime = ?, currboundtoken = ? WHERE uid = ?");
+                $updateStmt->bind_param("ssi", $currentTime, $token, $selectedUserId);
+                $updateStmt->execute();
+                $updateStmt->close();
+
+                echo "Token updated as creation time exceeded 10 minutes.";
+            } else {
+                // Use existing token
+                $token = $currToken;
+                echo "Token reused: " . htmlspecialchars($token);
+            }
+        }
+    } else {
+        echo "User not found.";
+    }
+
+    $stmt->close();
+
+    // Save token into a local variable for further processing
+    $localToken = $token;
 }
 ?>
 
@@ -86,6 +134,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                                         <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
                                         <button class="btn btn-success" type="submit" name="confirmUser">Confirm</button>
                                     </form>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Display Local Token if available -->
+                            <?php if (!empty($localToken)): ?>
+                                <div class="alert alert-info mt-4">
+                                    <strong>Token:</strong> <?php echo htmlspecialchars($localToken); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
