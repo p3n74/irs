@@ -183,13 +183,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                                     </form>
                                 </div>
                             <?php endif; ?>
-
-                            <!-- Display Local Token if available -->
-                            <?php if (!empty($localToken)): ?>
-                                <div class="alert alert-info mt-4">
-                                    <strong>Token:</strong> <?php echo htmlspecialchars($localToken); ?>
-                                </div>
-                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -197,16 +190,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
         </div>
     </section>
 
-    <!-- Modal for QR Code -->
+    <!-- QR Code Modal -->
     <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="qrCodeModalLabel">QR Code for Registration</h5>
+                    <h5 class="modal-title" id="qrCodeModalLabel">Your QR Code</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <img src="" alt="QR Code" class="img-fluid" />
+                    <img src="" alt="QR Code" width="100%" />
                 </div>
             </div>
         </div>
