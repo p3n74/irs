@@ -1,14 +1,16 @@
 <?php
-require "../db.php"; // Database connection file
+// Include the database connection file
+require "../db.php"; // Replace with actual path to your db connection file
 
 // Initialize variables
 $searchError = "";
 $userDetails = null; // To store the queried user details
 $selectedUserId = null;
-$localToken = ""; // To store the final token
-$userEventStatus = null; // Save attendance status
+$eventStatusButton = ""; // Variable to hold the button status
+$userEventStatus = null; // Store user event status (0, 1, or 2)
+$localToken = ''; // Store the generated token (if any)
 
-$eventid = $_SESSION['eventid']; 
+$eventid = $_SESSION['eventid'];  // Assuming you have the event ID stored in session
 
 // Handle the search query
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
@@ -23,8 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
         $fname = $names[0];
         $lname = $names[1];
 
-        // Search for the user in the database
-        $stmt = $conn->prepare("SELECT uid, fname, lname, email, currboundtoken, creationtime FROM user_credentials WHERE fname = ? AND lname = ?");
+        // Query the user based on first and last name
+        $stmt = $conn->prepare("SELECT uid, fname, lname, email FROM user_credentials WHERE fname = ? AND lname = ?");
         $stmt->bind_param("ss", $fname, $lname);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -32,77 +34,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
         if ($result && $result->num_rows > 0) {
             $userDetails = $result->fetch_assoc();
             $selectedUserId = $userDetails['uid'];  // Store selected user ID
-            
-            // Check if the token is outdated (more than 10 minutes old)
-            $currentTime = date("Y-m-d H:i:s");
-            $creationTime = $userDetails['creationtime'];
-            
-            if ($creationTime) {
-                $tenMinutesAgo = strtotime($currentTime) - 600; // 600 seconds = 10 minutes
-                $creationTimestamp = strtotime($creationTime);
 
-                if ($creationTimestamp < $tenMinutesAgo) {
-                    // Token is outdated, generate a new one
-                    $newToken = bin2hex(random_bytes(32));
-                    $updateStmt = $conn->prepare("UPDATE user_credentials SET creationtime = ?, currboundtoken = ? WHERE uid = ?");
-                    $updateStmt->bind_param("ssi", $currentTime, $newToken, $selectedUserId);
-                    $updateStmt->execute();
-                    $updateStmt->close();
+            // Query the event_participants table to check if the user has joined the event
+            $eventQuery = $conn->prepare("SELECT join_time, leave_time FROM event_participants WHERE user_id = ? AND event_id = ?");
+            $eventQuery->bind_param("ii", $selectedUserId, $eventid);
+            $eventQuery->execute();
+            $eventResult = $eventQuery->get_result();
 
-                    // Fetch the new token
-                    $userDetails['currboundtoken'] = $newToken; // Update local userDetails with the new token
-                    echo "Token updated as creation time exceeded 10 minutes.";
+            // Check if the user is part of the event participants
+            if ($eventResult && $eventResult->num_rows > 0) {
+                // User has joined the event, now check their join and leave times
+                $eventData = $eventResult->fetch_assoc();
+                $joinTime = $eventData['join_time'];
+                $leaveTime = $eventData['leave_time'];
+
+                if (is_null($joinTime) && is_null($leaveTime)) {
+                    // User has not joined yet
+                    $userEventStatus = 0; // Join Event
+                } elseif (!is_null($joinTime) && is_null($leaveTime)) {
+                    // User has joined but not left yet
+                    $userEventStatus = 1; // Leave Event
                 } else {
-                    // Use existing token
-                    echo "Token reused: " . htmlspecialchars($userDetails['currboundtoken']);
+                    // User has both joined and left
+                    $userEventStatus = 2; // Already attended
                 }
-            }
-
-            // Fetch the user's event attendance status (assuming a column `event_status`)
-            $stmtStatus = $conn->prepare("SELECT event_status FROM user_event_status WHERE uid = ? AND eventid = ?");
-            $stmtStatus->bind_param("ii", $selectedUserId, $eventid);
-            $stmtStatus->execute();
-            $resultStatus = $stmtStatus->get_result();
-            
-            if ($resultStatus && $resultStatus->num_rows > 0) {
-                $eventStatus = $resultStatus->fetch_assoc();
-                $userEventStatus = $eventStatus['event_status'];
             } else {
-                $userEventStatus = 0; // If no status found, assume the user hasn't joined the event
+                // User has not joined the event
+                $userEventStatus = 0; // Join Event
             }
-
-            $stmtStatus->close();
         } else {
-            $searchError = "No user found with the provided name.";
+            // User not found in the database
+            $searchError = "User not found.";
         }
-        $stmt->close();
     }
 }
 
-// Handle confirmation of user details and attendance logic
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
-    $selectedUserId = $_POST['userId'];
-    $token = "";
-
-    // Save the updated or existing token into a variable for the QR code
-    if (isset($userDetails['currboundtoken'])) {
-        $token = $userDetails['currboundtoken'];
-    }
-
-    // Re-run the query to fetch the updated token after the update if needed
-    $stmt = $conn->prepare("SELECT currboundtoken FROM user_credentials WHERE uid = ?");
-    $stmt->bind_param("i", $selectedUserId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result && $row = $result->fetch_assoc()) {
-        $token = $row['currboundtoken'];  // Fetch the updated token
-    }
-    $stmt->close();
-
-    // Embed the token into the QR code generation
-    $localToken = $token;
+// Logic to generate a token (for demonstration, it could be more complex)
+if ($userDetails && $userEventStatus !== null) {
+    $localToken = bin2hex(random_bytes(16)); // Example of token generation
 }
+
 ?>
 
 <!DOCTYPE html>
