@@ -57,6 +57,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
                     echo "Token reused: " . htmlspecialchars($userDetails['currboundtoken']);
                 }
             }
+
+            // Fetch the user's event attendance status (assuming a column `event_status`)
+            $stmtStatus = $conn->prepare("SELECT event_status FROM user_event_status WHERE uid = ? AND eventid = ?");
+            $stmtStatus->bind_param("ii", $selectedUserId, $eventid);
+            $stmtStatus->execute();
+            $resultStatus = $stmtStatus->get_result();
+            
+            if ($resultStatus && $resultStatus->num_rows > 0) {
+                $eventStatus = $resultStatus->fetch_assoc();
+                $userEventStatus = $eventStatus['event_status'];
+            } else {
+                $userEventStatus = 0; // If no status found, assume the user hasn't joined the event
+            }
+
+            $stmtStatus->close();
         } else {
             $searchError = "No user found with the provided name.";
         }
