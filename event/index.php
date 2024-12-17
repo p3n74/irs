@@ -171,12 +171,13 @@ if ($userDetails && $userEventStatus !== null) {
                             <?php endif; ?>
                         </div>
                     </div>
-                </div>
-            </div>
-                 <!-- Back Button below the grey container -->
+                   <!-- Back Button below the grey container -->
             <div class="container text-center mt-3">
                 <a href="../index.php" class="btn btn-secondary">Back</a>
             </div>
+                </div>
+            </div>
+
         </div>
       
 
