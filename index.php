@@ -8,12 +8,13 @@ $error = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $eventKey = $_POST['eventKey'];
 
-    $query = "SELECT COUNT(*) AS count FROM events WHERE event_key = '$eventKey'";
+    $query = "SELECT eventid FROM events WHERE eventkey = '$eventkey'";
     $result = $conn->query($query);
 
     if ($result) {
         $row = $result->fetch_assoc();
         if ($row['count'] > 0) {
+            $_SESSION['eventid'] = $row['eventid'];
             $_SESSION['eventKey'] = $eventKey;
             header("Location: event/");
             exit();
