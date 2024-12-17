@@ -112,6 +112,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
     // Save token into a local variable for further processing
     $localToken = $token;
+
+    // Now generate the QR code using the updated token and display the modal
+    echo "<script>
+        var qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=' + $selectedUserId + '&token=' + '$token' + '&format=svg';
+        $('#qrCodeModal img').attr('src', qrCodeUrl);
+        $('#qrCodeModal').modal('show');
+    </script>";
 }
 ?>
 
@@ -127,17 +134,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     <!-- Include the necessary jQuery and Bootstrap JS for modal -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Function to open the modal with the QR code
-        function showQRCode(event, userId, token) {
-            event.preventDefault(); // Prevent page refresh on form submission
-
-            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=" + userId + "&token=" + token + "&format=svg";
-            $('#qrCodeModal img').attr('src', qrCodeUrl);
-            $('#qrCodeModal').modal('show');
-        }
-    </script>
 </head>
 <body>
     <section class="vh-100 gradient-custom">
@@ -174,9 +170,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
                                         <!-- Button logic based on user event status -->
                                         <?php if ($userEventStatus === 0): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Join Event</button>
+                                            <button class="btn btn-primary" type="submit" name="confirmUser">Join Event</button>
                                         <?php elseif ($userEventStatus === 1): ?>
-                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
+                                            <button class="btn btn-danger" type="submit" name="confirmUser">Leave Event</button>
                                         <?php elseif ($userEventStatus === 2): ?>
                                             <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
                                         <?php endif; ?>
