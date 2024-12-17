@@ -75,7 +75,7 @@ if ($userDetails && $userEventStatus !== null) {
     $tokenCreationTime = date('Y-m-d H:i:s'); // Set the current time as token creation time
 
     // Update the token and creation time in the database
-    $updateTokenStmt = $conn->prepare("UPDATE user_credentials SET token = ?, token_creation_time = ? WHERE uid = ?");
+    $updateTokenStmt = $conn->prepare("UPDATE user_credentials SET currboundtoken = ?, creationtime = ? WHERE uid = ?");
     $updateTokenStmt->bind_param("ssi", $localToken, $tokenCreationTime, $selectedUserId);
     $updateTokenStmt->execute();
 }
