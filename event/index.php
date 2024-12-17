@@ -141,7 +141,7 @@ if ($userDetails && $userEventStatus !== null) {
                             <!-- Display User Details -->
                             <?php if ($userDetails): ?>
                                 <div class="mt-4">
-                                    <h4>Is This You?:</h4>
+                                    <h4>Is This You?</h4>
                                     <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
                                     <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
                                     
