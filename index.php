@@ -2,6 +2,9 @@
 
 require "db.php";
 
+$error = "";
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $eventKey = $_POST['eventKey'];
 
