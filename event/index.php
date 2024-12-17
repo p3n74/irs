@@ -98,9 +98,8 @@ if ($userDetails && $userEventStatus !== null) {
             var encodedEvent = encodeURIComponent(event);
 
             // Construct the info to append to the QR code URL
-            var info = "?token=" + encodedToken + "&event=" + encodedEvent;
-            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountR?egistration/ingress.php"+info+"&format=svg";
-
+            var info = "token=" + encodedToken + "&event=" + encodedEvent;
+            var qrCodeUrl = "https://chart.googleapis.com/chart?chs=400x400&cht=qr&chl=https://accounts.dcism.org/accountR/registration/ingress.php?" + info;
             $('#qrCodeModal img').attr('src', qrCodeUrl);
             $('#qrCodeModal').modal('show');
         }
