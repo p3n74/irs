@@ -36,7 +36,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
 
         if ($result && $result->num_rows > 0) {
             $userDetails = $result->fetch_assoc();
+            $selectedUserId = $userDetails['uid'];  // Store selected user ID
+            
+            // Query to check event participation status
+            $stmt2 = $conn->prepare("SELECT join_time, leave_time FROM event_participants WHERE uid = ? AND eventid = ?");
+            $stmt2->bind_param("ii", $selectedUserId, $eventid);
+            $stmt2->execute();
+            $eventResult = $stmt2->get_result();
+            
+            if ($eventResult && $eventResult->num_rows > 0) {
+                $eventRow = $eventResult->fetch_assoc();
+                
+                // Determine the user's event status
+                if (is_null($eventRow['join_time']) && is_null($eventRow['leave_time'])) {
+                    $userEventStatus = 0; // Not joined or attended
+                } elseif (!is_null($eventRow['join_time']) && is_null($eventRow['leave_time'])) {
+                    $userEventStatus = 1; // Currently attending
+                } elseif (!is_null($eventRow['join_time']) && !is_null($eventRow['leave_time'])) {
+                    $userEventStatus = 2; // Fully attended and left
+                }
+            } else {
+                $userEventStatus = 0; // User has not registered for the event
+            }
         } else {
+            $searchError = "No user found with the provided name.";
+        }
+        $stmt->close();
+    }
+}e {
             $searchError = "No user found with the provided name.";
         }
         $stmt->close();
@@ -96,33 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     // Save token into a local variable for further processing
     $localToken = $token;
 
-    // Check attendance status in event_participants
-    $statusStmt = $conn->prepare("SELECT join_time, leave_time FROM event_participants WHERE uid = ? AND eventid = ?");
-    $statusStmt->bind_param("ii", $selectedUserId, $eventid);
-    $statusStmt->execute();
-    $statusResult = $statusStmt->get_result();
-
-    if ($statusResult && $row = $statusResult->fetch_assoc()) {
-        $joinTime = $row['join_time'];
-        $leaveTime = $row['leave_time'];
-
-        // Determine user event status
-        if (is_null($joinTime) && is_null($leaveTime)) {
-            $userEventStatus = 0; // Not attended
-        } elseif (!is_null($joinTime) && is_null($leaveTime)) {
-            $userEventStatus = 1; // Currently attending
-        } elseif (!is_null($joinTime) && !is_null($leaveTime)) {
-            $userEventStatus = 2; // Fully attended
-        }
-    } else {
-        // No record found for this user and event
-        $userEventStatus = 0; // Default to not attended
-    }
-    $statusStmt->close();
-
-    // Display status for debugging (optional)
-    echo "<br>User Event Status: " . $userEventStatus;
-    echo "<br>Local Token: " . htmlspecialchars($localToken);
+    
 }
 ?>
 
