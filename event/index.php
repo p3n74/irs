@@ -136,14 +136,15 @@ if ($userDetails && $userEventStatus !== null) {
 
                                         <!-- Button logic based on user event status -->
                                         <?php if ($userEventStatus === 0): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(<?php echo $eventId; ?>, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Join Event</button>
+                                            <button class="btn btn-primary" 
+                                                    onclick="showQRCode(event, <?php echo $eventid; ?>, '<?php echo $localToken; ?>')">Join Event</button>
                                         <?php elseif ($userEventStatus === 1): ?>
-                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(<?php echo $eventId; ?>, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
+                                            <button class="btn btn-danger" 
+                                                    onclick="showQRCode(event, <?php echo $eventid; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
                                         <?php elseif ($userEventStatus === 2): ?>
-                                            <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
+                                            <button class="btn btn-secondary" disabled>You have already attended</button>
                                         <?php endif; ?>
-                                    </form>
-                                </div>
+                                    </form>                                </div>
                             <?php endif; ?>
 
                             <!-- Display Local Token if available -->
