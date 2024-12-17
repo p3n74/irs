@@ -128,24 +128,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-    // Function to open the modal with the QR code
-    function showQRCode(event, userId, token) {
-        event.preventDefault(); // Prevent page refresh on form submission
+              <script>
+              // Function to open the modal with the QR code
+              function showQRCode(event, userId, token) {
+                  event.preventDefault(); // Prevent page refresh on form submission
 
-        // Create a single string with userId and token
-        var dataString = "userid=" + userId + "&token=" + token;
+                  // Create a single string with userId and token
+                  var dataString = "userid=" + userId + "&token=" + token;
 
-        // Generate the QR code URL with the combined string
-        var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?" + dataString + "&format=svg";
+                  // Generate the QR code URL with the combined string
+                  var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?" + dataString + "&format=svg";
 
-        // Set the QR code image source
-        $('#qrCodeModal img').attr('src', qrCodeUrl);
+                  // Set the QR code image source
+                  $('#qrCodeModal img').attr('src', qrCodeUrl);
 
-        // Show the modal with the QR code
-        $('#qrCodeModal').modal('show');
-    }
-</script>
+                  // Show the modal with the QR code
+                  $('#qrCodeModal').modal('show');
+              }
+          </script>
 </head>
 <body>
     <section class="vh-100 gradient-custom">
@@ -176,19 +176,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                                     <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
                                     <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
                                     
-                                    <!-- Confirmation Form -->
+                                   <!-- The PHP section outputs the JavaScript call with the userId and token -->
                                     <form method="POST" action="">
                                         <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
-
-                                        <!-- Button logic based on user event status -->
-                                        <?php if ($userEventStatus === 0): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Join Event</button>
-                                        <?php elseif ($userEventStatus === 1): ?>
-                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
-                                        <?php elseif ($userEventStatus === 2): ?>
-                                            <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
-                                        <?php endif; ?>
+                                        <?php if (!empty($localToken)): ?>
+                                            <button class="btn btn-primary" type="submit" name="confirmUser" 
+                                                onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">
+                                                Join Event
+                                            </button>
+                                        <?php endif; echo "Token: " . $localToken; ?>
                                     </form>
+
                                 </div>
                             <?php endif; ?>
                         </div>
