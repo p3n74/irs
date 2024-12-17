@@ -83,7 +83,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
             $updateStmt->bind_param("ssi", $currentTime, $token, $selectedUserId);
             $updateStmt->execute();
             $updateStmt->close();
-
             echo "New token generated as creation time was empty.";
         } else {
             // Check if the creationtime is older than 10 minutes
@@ -97,7 +96,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                 $updateStmt->bind_param("ssi", $currentTime, $token, $selectedUserId);
                 $updateStmt->execute();
                 $updateStmt->close();
-
                 echo "Token updated as creation time exceeded 10 minutes.";
             } else {
                 // Use existing token
@@ -112,6 +110,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
     // Save token into a local variable for further processing
     $localToken = $token;
+
+    // Re-run the query to fetch the updated token after the update
+    $stmt = $conn->prepare("SELECT currboundtoken FROM user_credentials WHERE uid = ?");
+    $stmt->bind_param("i", $selectedUserId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $row = $result->fetch_assoc()) {
+        $localToken = $row['currboundtoken'];  // Fetch the updated token
+    }
+    $stmt->close();
 }
 ?>
 
