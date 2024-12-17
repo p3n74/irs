@@ -71,9 +71,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
 
 // Logic to generate a token (for demonstration, it could be more complex)
 if ($userDetails && $userEventStatus !== null) {
-    $localToken = bin2hex(random_bytes(16)); // Example of token generation
-}
+    $localToken = bin2hex(random_bytes(32)); 
+    $tokenCreationTime = date('Y-m-d H:i:s'); // Set the current time as token creation time
 
+    // Update the token and creation time in the database
+    $updateTokenStmt = $conn->prepare("UPDATE user_credentials SET token = ?, token_creation_time = ? WHERE uid = ?");
+    $updateTokenStmt->bind_param("ssi", $localToken, $tokenCreationTime, $selectedUserId);
+    $updateTokenStmt->execute();
+}
 ?>
 
 <!DOCTYPE html>
