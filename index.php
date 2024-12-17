@@ -8,7 +8,7 @@ $error = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $eventKey = $_POST['eventKey'];
 
-    $query = "SELECT eventid FROM events WHERE eventkey = '$eventkey'";
+    $query = "SELECT eventid FROM events WHERE eventkey = '$eventKey'";
     $result = $conn->query($query);
 
     if ($result) {
