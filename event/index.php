@@ -91,11 +91,11 @@ if ($userDetails && $userEventStatus !== null) {
 
     <script>
         // Function to open the modal with the QR code using the QR Server API
-        function showQRCode(event, userId, token) {
+        function showQRCode(eventid, token) {
             event.preventDefault(); // Prevent form submission and page refresh
 
             // Construct the URL with token and event parameters
-            const url = `https://accounts.dcism.org/accountR/registration/ingress.php?token=${token}&event=${event}`;
+            const url = `https://accounts.dcism.org/accountR/registration/ingress.php?token=${token}&event=${eventid}`;
 
             // Encode the URL to ensure proper handling of special characters
             const encodedUrl = encodeURIComponent(url);
@@ -147,10 +147,10 @@ if ($userDetails && $userEventStatus !== null) {
                                         <!-- Button logic based on user event status -->
                                         <?php if ($userEventStatus === 0): ?>
                                             <button class="btn btn-primary" 
-                                                    onclick="showQRCode(event, <?php echo $eventid; ?>, '<?php echo $localToken; ?>')">Join Event</button>
+                                                    onclick="showQRCode('<?php echo $eventid; ?>', '<?php echo $localToken; ?>')">Join Event</button>
                                         <?php elseif ($userEventStatus === 1): ?>
                                             <button class="btn btn-danger" 
-                                                    onclick="showQRCode(event, <?php echo $eventid?>, '<?php echo $localToken; ?>')">Leave Event</button>
+                                                    onclick="showQRCode('<?php echo $eventid?>', '<?php echo $localToken; ?>')">Leave Event</button>
                                         <?php elseif ($userEventStatus === 2): ?>
                                             <button class="btn btn-secondary" disabled>You have already attended</button>
                                         <?php endif; ?>
