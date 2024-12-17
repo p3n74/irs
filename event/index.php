@@ -129,15 +129,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Function to open the modal with the QR code
-        function showQRCode(event, userId, token) {
-            event.preventDefault(); // Prevent page refresh on form submission
+    // Function to open the modal with the QR code
+    function showQRCode(event, userId, token) {
+        event.preventDefault(); // Prevent page refresh on form submission
 
-            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=" + userId + "&token=" + token + "&format=svg";
-            $('#qrCodeModal img').attr('src', qrCodeUrl);
-            $('#qrCodeModal').modal('show');
-        }
-    </script>
+        // Create a single string with userId and token
+        var dataString = "userid=" + userId + "&token=" + token;
+
+        // Generate the QR code URL with the combined string
+        var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?" + dataString + "&format=svg";
+
+        // Set the QR code image source
+        $('#qrCodeModal img').attr('src', qrCodeUrl);
+
+        // Show the modal with the QR code
+        $('#qrCodeModal').modal('show');
+    }
+</script>
 </head>
 <body>
     <section class="vh-100 gradient-custom">
