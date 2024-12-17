@@ -12,8 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $conn->query($query);
 
     if ($result) {
-        $row = $result->fetch_assoc();
-        if ($row['count'] > 0) {
+        if ($row = $result->fetch_assoc()) {
             $_SESSION['eventid'] = $row['eventid'];
             $_SESSION['eventKey'] = $eventKey;
             header("Location: event/");
