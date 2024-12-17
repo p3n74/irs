@@ -63,13 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
         }
         $stmt->close();
     }
-}e {
-            $searchError = "No user found with the provided name.";
-        }
-        $stmt->close();
-    }
 }
-
 // Handle confirmation of user details and attendance logic
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     $selectedUserId = $_POST['userId'];
@@ -123,7 +117,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     // Save token into a local variable for further processing
     $localToken = $token;
 
-    
 }
 ?>
 
