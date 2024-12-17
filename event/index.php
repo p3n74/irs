@@ -12,7 +12,7 @@ $eventid = $_SESSION['eventid'];
 
 echo "debug";
 echo $selectedUserId;
-echo $localTokem;
+echo $localToken;
 echo $userEventStatus;
 
 // Handle the search query
