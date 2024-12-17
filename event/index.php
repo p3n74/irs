@@ -184,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                                                 onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">
                                                 Join Event
                                             </button>
-                                        <?php endif; echo "Token: " . $localToken; ?>
+                                        <?php endif;?>
                                     </form>
 
                                 </div>
