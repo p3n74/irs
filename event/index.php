@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
         $lname = $names[1];
 
         // Search for the user in the database
-        $stmt = $conn->prepare("SELECT uid, fname, lname, email FROM user_credentials WHERE fname = ? AND lname = ?");
+        $stmt = $conn->prepare("SELECT uid, fname, lname, email, currboundtoken FROM user_credentials WHERE fname = ? AND lname = ?");
         $stmt->bind_param("ss", $fname, $lname);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -130,10 +130,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
     <script>
         // Function to open the modal with the QR code
-        function showQRCode(event, userId, token) {
+        function showQRCode(event, userId, tokens) {
             event.preventDefault(); // Prevent page refresh on form submission
 
-            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=" + userId + "&token=" + token + "&format=svg";
+            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=" + userId + "&token=" + tokens + "&format=svg";
             $('#qrCodeModal img').attr('src', qrCodeUrl);
             $('#qrCodeModal').modal('show');
         }
@@ -174,9 +174,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
                                         <!-- Button logic based on user event status -->
                                         <?php if ($userEventStatus === 0): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Join Event</button>
+                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $userDetails['currboundtoken']; ?>')">Join Event</button>
                                         <?php elseif ($userEventStatus === 1): ?>
-                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
+                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $userDetails['currboundtoken']; ?>')">Leave Event</button>
                                         <?php elseif ($userEventStatus === 2): ?>
                                             <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
                                         <?php endif; ?>
