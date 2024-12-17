@@ -10,11 +10,6 @@ $userEventStatus = null; // To save attendance status
 
 $eventid = $_SESSION['eventid']; 
 
-echo "debug";
-echo $selectedUserId;
-echo $localToken;
-echo $userEventStatus;
-
 // Handle the search query
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
     // Sanitize user input
@@ -64,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
         $stmt->close();
     }
 }
+
 // Handle confirmation of user details and attendance logic
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     $selectedUserId = $_POST['userId'];
@@ -116,7 +112,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
     // Save token into a local variable for further processing
     $localToken = $token;
-
 }
 ?>
 
@@ -128,6 +123,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     <title>Search User</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet">
+
+    <!-- Include the necessary jQuery and Bootstrap JS for modal -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Function to open the modal with the QR code
+        function showQRCode() {
+            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=<?php echo $selectedUserId; ?>&token=<?php echo $localToken; ?>&format=svg";
+            $('#qrCodeModal img').attr('src', qrCodeUrl);
+            $('#qrCodeModal').modal('show');
+        }
+    </script>
 </head>
 <body>
     <section class="vh-100 gradient-custom">
@@ -147,46 +155,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                             </form>
 
                             <!-- Error Message -->
-              <?php if ($searchError): ?>
-                    <div class="alert alert-danger mt-3"><?php echo $searchError; ?></div>
-              <?php endif; ?>
+                            <?php if ($searchError): ?>
+                                <div class="alert alert-danger mt-3"><?php echo $searchError; ?></div>
+                            <?php endif; ?>
 
-              <!-- Display User Details -->
-              <?php if ($userDetails): ?>
-                  <div class="mt-4">
-                      <h4>Is This You?:</h4>
-                      <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
-                      <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
-                    
-                    <!-- Confirmation Form -->
-                      <form method="POST" action="">
-                          <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
+                            <!-- Display User Details -->
+                            <?php if ($userDetails): ?>
+                                <div class="mt-4">
+                                    <h4>Is This You?:</h4>
+                                    <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
+                                    <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
+                                    
+                                    <!-- Confirmation Form -->
+                                    <form method="POST" action="">
+                                        <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
 
-                          <!-- Button logic based on user event status -->
-                          <?php if ($userEventStatus === 0): ?>
-                              <button class="btn btn-primary" type="submit" name="confirmUser">Join Event</button>
-                          <?php elseif ($userEventStatus === 1): ?>
-                            <button class="btn btn-danger" type="submit" name="confirmUser">Leave Event</button>
-                        <?php elseif ($userEventStatus === 2): ?>
-                            <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
-                        <?php endif; ?>
-                    </form>
-              </div>
-          <?php endif; ?>
+                                        <!-- Button logic based on user event status -->
+                                        <?php if ($userEventStatus === 0): ?>
+                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode()">Join Event</button>
+                                        <?php elseif ($userEventStatus === 1): ?>
+                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode()">Leave Event</button>
+                                        <?php elseif ($userEventStatus === 2): ?>
+                                            <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
+                                        <?php endif; ?>
+                                    </form>
+                                </div>
+                            <?php endif; ?>
 
-          <!-- Display Local Token if available -->
-          <?php if (!empty($localToken)): ?>
-              <div class="alert alert-info mt-4">
-                  <strong>Token:</strong> <?php echo htmlspecialchars($localToken); ?>
-              </div>
-        <?php endif; ?>
+                            <!-- Display Local Token if available -->
+                            <?php if (!empty($localToken)): ?>
+                                <div class="alert alert-info mt-4">
+                                    <strong>Token:</strong> <?php echo htmlspecialchars($localToken); ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Modal for QR Code -->
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrCodeModalLabel">QR Code for Registration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="" alt="QR Code" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 
