@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     $selectedUserId = $_POST['userId'];
     $currentTime = date("Y-m-d H:i:s");
 
-    // Generate token and update user state
+    // Generate token and update user token
     $stmt = $conn->prepare("SELECT creationtime, currboundtoken FROM user_credentials WHERE uid = ?");
     $stmt->bind_param("i", $selectedUserId);
     $stmt->execute();
@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
         $creationTime = $row['creationtime'];
         $currToken = $row['currboundtoken'];
 
-        // Generate new token if older than 10 minutes or if no token exists
+        // Generate new token if creationtime is older than 10 minutes or if no token exists
         if (is_null($creationTime) || strtotime($creationTime) < (strtotime($currentTime) - 600)) {
             $token = bin2hex(random_bytes(32));
             $updateStmt = $conn->prepare("UPDATE user_credentials SET creationtime = ?, currboundtoken = ? WHERE uid = ?");
@@ -83,21 +83,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
             $token = $currToken;
         }
 
-        $localToken = $token;
+        $localToken = $token; // Save token to variable for later use
 
-        // Update event participation status
-        if ($_POST['action'] === 'join') {
-            $stmt = $conn->prepare("INSERT INTO event_participants (uid, eventid, join_time) VALUES (?, ?, ?)
-                                    ON DUPLICATE KEY UPDATE join_time = ?");
-            $stmt->bind_param("iiss", $selectedUserId, $eventid, $currentTime, $currentTime);
-            $stmt->execute();
-        } elseif ($_POST['action'] === 'leave') {
-            $stmt = $conn->prepare("UPDATE event_participants SET leave_time = ? WHERE uid = ? AND eventid = ?");
-            $stmt->bind_param("sii", $currentTime, $selectedUserId, $eventid);
-            $stmt->execute();
-        }
+        // Only update token, no need to modify event participation times
+        echo json_encode(['token' => $token]);
     }
+    $stmt->close();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -108,79 +101,114 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     <title>Search User</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet">
+
+    <!-- Include the necessary jQuery and Bootstrap JS for modal -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AJAX Script -->
     <script>
     $(document).ready(function() {
+        // Prevent the form submission from refreshing the page
         $("form#confirmUserForm").on("submit", function(event) {
             event.preventDefault();
-            var userId = $("input[name='userId']").val();
-            var action = $("input[name='action']").val();
 
-            $.post("", { confirmUser: true, userId: userId, action: action }, function(response) {
-                var qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=' + userId + '&token=<?php echo $localToken; ?>';
-                $('#qrCodeModal img').attr('src', qrCodeUrl);
-                $('#qrCodeModal').modal('show');
+            // Get userId and action (Join or Leave)
+            var userId = $("input[name='userId']").val();
+            var action = $("input[name='action']:checked").val(); // Get the selected action
+
+            // Send AJAX request to update token and get QR code
+            $.ajax({
+                url: "",  // Current page
+                method: "POST",
+                data: {
+                    confirmUser: true,
+                    userId: userId,
+                    action: action
+                },
+                success: function(response) {
+                    var data = JSON.parse(response);
+                    var token = data.token.trim();
+
+                    // Generate QR code with the new token and user ID
+                    var qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=' + userId + '&token=' + token;
+
+                    // Set the QR code URL in the modal
+                    $('#qrCodeModal img').attr('src', qrCodeUrl);
+
+                    // Show the modal with the QR code
+                    $('#qrCodeModal').modal('show');
+                }
             });
         });
     });
     </script>
 </head>
 <body>
-<section class="vh-100 gradient-custom">
-    <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-md-8 col-lg-6 col-xl-5">
-                <div class="card bg-dark text-white" style="border-radius: 1rem;">
-                    <div class="card-body p-5 text-center">
-                        <h2 class="fw-bold mb-4">Search User</h2>
-                        <form method="POST" action="">
-                            <input type="text" name="searchName" class="form-control mb-4" placeholder="Enter First and Last Name" required />
-                            <button class="btn btn-light btn-lg" type="submit">Search</button>
-                        </form>
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                        <div class="card-body p-5 text-center">
+                            <h2 class="fw-bold mb-4 text-uppercase">Search User</h2>
 
-                        <?php if ($searchError): ?>
-                            <div class="alert alert-danger mt-3"><?php echo $searchError; ?></div>
-                        <?php endif; ?>
+                            <!-- Search Form -->
+                            <form method="POST" action="">
+                                <div class="form-outline form-white mb-4">
+                                    <input type="text" name="searchName" class="form-control form-control-lg" placeholder="Enter First and Last Name" autocomplete="off" required />
+                                </div>
+                                <button class="btn btn-outline-light btn-lg px-5" type="submit">Search</button>
+                            </form>
 
-                        <?php if ($userDetails): ?>
-                            <div class="mt-4">
-                                <h4>User Found:</h4>
-                                <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
-                                <form id="confirmUserForm">
-                                    <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
-                                    <?php if ($userEventStatus === 0): ?>
-                                        <input type="hidden" name="action" value="join" />
-                                        <button class="btn btn-primary" type="submit">Join Event</button>
-                                    <?php elseif ($userEventStatus === 1): ?>
-                                        <input type="hidden" name="action" value="leave" />
-                                        <button class="btn btn-danger" type="submit">Leave Event</button>
-                                    <?php elseif ($userEventStatus === 2): ?>
-                                        <button class="btn btn-secondary" disabled>Already Attended</button>
-                                    <?php endif; ?>
-                                </form>
-                            </div>
-                        <?php endif; ?>
+                            <!-- Error Message -->
+                            <?php if ($searchError): ?>
+                                <div class="alert alert-danger mt-3"><?php echo $searchError; ?></div>
+                            <?php endif; ?>
+
+                            <!-- Display User Details -->
+                            <?php if ($userDetails): ?>
+                                <div class="mt-4">
+                                    <h4>Is This You?:</h4>
+                                    <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
+                                    <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
+                                    
+                                    <!-- Confirmation Form -->
+                                    <form id="confirmUserForm">
+                                        <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
+
+                                        <!-- Button logic based on user event status -->
+                                        <?php if ($userEventStatus === 0): ?>
+                                            <button class="btn btn-primary" type="submit" name="action" value="join">Join Event</button>
+                                        <?php elseif ($userEventStatus === 1): ?>
+                                            <button class="btn btn-danger" type="submit" name="action" value="leave">Leave Event</button>
+                                        <?php elseif ($userEventStatus === 2): ?>
+                                            <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
+                                        <?php endif; ?>
+                                    </form>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<div class="modal fade" id="qrCodeModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Event QR Code</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <img src="" alt="QR Code" class="img-fluid" />
+    <!-- QR Code Modal -->
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrCodeModalLabel">Your Event QR Code</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="" alt="QR Code" class="img-fluid"/>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 </html>
 
