@@ -128,24 +128,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-              <script>
-              // Function to open the modal with the QR code
-              function showQRCode(event, userId, token) {
-                  event.preventDefault(); // Prevent page refresh on form submission
+    <script>
+        // Function to open the modal with the QR code
+        function showQRCode(event, userId, token) {
+            event.preventDefault(); // Prevent page refresh on form submission
 
-                  // Create a single string with userId and token
-                  var dataString = "userid=" + userId + "&token=" + token;
-
-                  // Generate the QR code URL with the combined string
-                  var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?" + dataString + "&format=svg";
-
-                  // Set the QR code image source
-                  $('#qrCodeModal img').attr('src', qrCodeUrl);
-
-                  // Show the modal with the QR code
-                  $('#qrCodeModal').modal('show');
-              }
-          </script>
+            var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountRegistration/ingress.php?userid=" + userId + "&token=" + token + "&format=svg";
+            $('#qrCodeModal img').attr('src', qrCodeUrl);
+            $('#qrCodeModal').modal('show');
+        }
+    </script>
 </head>
 <body>
     <section class="vh-100 gradient-custom">
@@ -176,17 +168,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
                                     <p><strong>Name:</strong> <?php echo htmlspecialchars($userDetails['fname'] . " " . $userDetails['lname']); ?></p>
                                     <p><strong>Email:</strong> <?php echo htmlspecialchars($userDetails['email']); ?></p>
                                     
-                                   <!-- The PHP section outputs the JavaScript call with the userId and token -->
+                                    <!-- Confirmation Form -->
                                     <form method="POST" action="">
                                         <input type="hidden" name="userId" value="<?php echo $userDetails['uid']; ?>" />
-                                        <?php if (!empty($localToken)): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser" 
-                                                onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">
-                                                Join Event
-                                            </button>
-                                        <?php endif;?>
-                                    </form>
 
+                                        <!-- Button logic based on user event status -->
+                                        <?php if ($userEventStatus === 0): ?>
+                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Join Event</button>
+                                        <?php elseif ($userEventStatus === 1): ?>
+                                            <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $localToken; ?>')">Leave Event</button>
+                                        <?php elseif ($userEventStatus === 2): ?>
+                                            <button class="btn btn-secondary" type="button" disabled>You have already attended</button>
+                                        <?php endif; ?>
+                                    </form>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Display Local Token if available -->
+                            <?php if (!empty($localToken)): ?>
+                                <div class="alert alert-info mt-4">
+                                    <strong>Token:</strong> <?php echo htmlspecialchars($localToken); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -196,20 +197,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
         </div>
     </section>
 
-    <!-- QR Code Modal -->
+    <!-- Modal for QR Code -->
     <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="qrCodeModalLabel">Your QR Code</h5>
+                    <h5 class="modal-title" id="qrCodeModalLabel">QR Code for Registration</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <img src="" alt="QR Code" width="100%" />
+                    <img src="" alt="QR Code" class="img-fluid" />
                 </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-
