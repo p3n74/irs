@@ -159,7 +159,8 @@ if ($userDetails && $userEventStatus !== null) {
                                         <?php elseif ($userEventStatus === 2): ?>
                                             <button class="btn btn-secondary" disabled>You have already attended</button>
                                         <?php endif; ?>
-                                    </form>                                </div>
+                                    </form>                                
+                                </div>
                             <?php endif; ?>
 
                             <!-- Display Local Token if available -->
@@ -174,6 +175,11 @@ if ($userDetails && $userEventStatus !== null) {
             </div>
         </div>
     </section>
+
+    <!-- Back Button below the grey container -->
+    <div class="container text-center mt-3">
+        <a href="../index.php" class="btn btn-secondary">Back</a>
+    </div>
 
     <!-- Modal for QR Code -->
     <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
@@ -191,4 +197,3 @@ if ($userDetails && $userEventStatus !== null) {
     </div>
 </body>
 </html>
-
