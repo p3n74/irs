@@ -174,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirmUser'])) {
 
                                         <!-- Button logic based on user event status -->
                                         <?php if ($userEventStatus === 0): ?>
-                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $userDetails['currbountoken']; ?>')">Join Event</button>
+                                            <button class="btn btn-primary" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $userDetails['currboundtoken']; ?>')">Join Event</button>
                                         <?php elseif ($userEventStatus === 1): ?>
                                             <button class="btn btn-danger" type="submit" name="confirmUser" onclick="showQRCode(event, <?php echo $userDetails['uid']; ?>, '<?php echo $userDetails['cussboundtoken']; ?>')">Leave Event</button>
                                         <?php elseif ($userEventStatus === 2): ?>
