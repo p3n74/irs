@@ -93,7 +93,12 @@ if ($userDetails && $userEventStatus !== null) {
         // Function to open the modal with the QR code
         function showQRCode(event, userId, token) {
             event.preventDefault(); // Prevent page refresh on form submission
-            var info = "token=" + token + "&event=" + event;
+            // URL encode the token and event to prevent any special characters from breaking the URL
+            var encodedToken = encodeURIComponent(token);
+            var encodedEvent = encodeURIComponent(event);
+
+            // Construct the info to append to the QR code URL
+            var info = "?token=" + encodedToken + "&event=" + encodedEvent;
             var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://accounts.dcism.org/accountR?egistration/ingress.php"+info+"&format=svg";
 
             $('#qrCodeModal img').attr('src', qrCodeUrl);
