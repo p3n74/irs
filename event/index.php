@@ -1,6 +1,6 @@
 <?php
 // Include the database connection file
-require "../db.php"; // Replace with actual path to your db connection file
+require "../db.php"; // Replace with the actual path to your db connection file
 
 // Initialize variables
 $searchError = "";
@@ -13,21 +13,17 @@ $localToken = ''; // Store the generated token (if any)
 $eventid = $_SESSION['eventid'];  // Assuming you have the event ID stored in session
 
 // Handle the search query
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchName'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchEmail'])) {
     // Sanitize user input
-    $searchInput = trim($_POST['searchName']);
-    $names = explode(" ", $searchInput);
+    $searchInput = trim($_POST['searchEmail']);
 
-    // Ensure at least first and last name are provided
-    if (count($names) < 2) {
-        $searchError = "Please enter both first and last name.";
+    // Validate email format
+    if (!filter_var($searchInput, FILTER_VALIDATE_EMAIL)) {
+        $searchError = "Please enter a valid email address.";
     } else {
-        $fname = $names[0];
-        $lname = $names[1];
-
-        // Query the user based on first and last name
-        $stmt = $conn->prepare("SELECT uid, fname, lname, email FROM user_credentials WHERE fname = ? AND lname = ?");
-        $stmt->bind_param("ss", $fname, $lname);
+        // Query the user based on email
+        $stmt = $conn->prepare("SELECT uid, fname, lname, email FROM user_credentials WHERE email = ?");
+        $stmt->bind_param("s", $searchInput);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -88,9 +84,8 @@ if ($userDetails && $userEventStatus !== null) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search User</title>
 
-<!-- Favicon -->
-<link rel="icon" href="icon.png" type="image/png">
-
+    <!-- Favicon -->
+    <link rel="icon" href="icon.png" type="image/png">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet">
@@ -133,7 +128,7 @@ if ($userDetails && $userEventStatus !== null) {
                             <!-- Search Form -->
                             <form method="POST" action="">
                                 <div class="form-outline form-white mb-4">
-                                    <input type="text" name="searchName" class="form-control form-control-lg" placeholder="Enter First and Last Name" autocomplete="off" required />
+                                    <input type="email" name="searchEmail" class="form-control form-control-lg" placeholder="Enter Email Address" autocomplete="off" required />
                                 </div>
                                 <button class="btn btn-outline-light btn-lg px-5" type="submit">Search</button>
                             </form>
@@ -182,13 +177,8 @@ if ($userDetails && $userEventStatus !== null) {
             </div>
                 </div>
             </div>
-
         </div>
-      
-
     </section>
-
-   
 
     <!-- Modal for QR Code -->
     <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
@@ -206,3 +196,4 @@ if ($userDetails && $userEventStatus !== null) {
     </div>
 </body>
 </html>
+
