@@ -100,7 +100,7 @@ if ($userDetails && $userEventStatus !== null) {
             event.preventDefault(); // Prevent form submission and page refresh
 
             // Construct the URL with token and event parameters
-            const url = `https://accounts.dcism.org/accountRegistration/ingress.php?token=${token}&event=${eventid}`;
+            const url = `https://accounts.dcism.org/accounts/ingress.php?token=${token}&event=${eventid}`;
 
             // Encode the URL to ensure proper handling of special characters
             const encodedUrl = encodeURIComponent(url);
